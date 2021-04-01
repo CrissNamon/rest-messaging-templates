@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -33,6 +33,6 @@ public class TemplateDto {
     /**
      * Set of endpoints to send message to
      */
-    @NotEmpty(message = "Template recipients required")
-    private Set<@NotEmpty String> recipients;
+    @NotNull(message = "Template recipients required")
+    private Set<Receiver> recipients;
 }

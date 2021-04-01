@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.model.SavedTemplate;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
@@ -48,7 +48,7 @@ public class TemplateScheduleTask implements Runnable{
                 try {
                     templateService.sendMessages(template, savedTemplate.getData());
                     logger.info("MESSAGES SENT FROM SCHEDULED TASK");
-                }catch (WebClientException e)
+                }catch (SenderException e)
                 {
                     logger.error("ERROR OCCURRED DURING SCHEDULED TEMPLATE WITH ID: "+savedTemplateId.toString());
                 }

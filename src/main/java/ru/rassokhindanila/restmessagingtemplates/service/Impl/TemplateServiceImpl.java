@@ -4,26 +4,23 @@ import com.sun.istack.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
-import ru.rassokhindanila.restmessagingtemplates.dto.WebClientRequest;
+import ru.rassokhindanila.restmessagingtemplates.dto.SenderRequest;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
-import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.mapper.TemplateDtoMapper;
-import ru.rassokhindanila.restmessagingtemplates.model.SavedTemplate;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 import ru.rassokhindanila.restmessagingtemplates.repository.TemplateRepository;
-import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
-import ru.rassokhindanila.restmessagingtemplates.service.WebClientService;
+import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
 import javax.validation.ConstraintViolation;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +30,9 @@ public class TemplateServiceImpl implements TemplateService {
     @Autowired
     private TemplateRepository templateRepository;
 
+    @Qualifier("webSenderService")
     @Autowired
-    private WebClientService webClientService;
+    private SenderService senderService;
 
     private final Logger logger;
 
@@ -109,17 +107,13 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public void sendMessages(@NotNull Template template, Map<String, String> variables) throws WebClientException
+    public void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException
     {
         String message = template.getTemplate();
         String updatedMessage = StringUtils.replaceVariables(message, variables);
-        WebClientRequest request = new WebClientRequest(updatedMessage);
-        webClientService.postMany(template.getRecipients(), request)
+        SenderRequest request = new SenderRequest(updatedMessage);
+        senderService.send(template.getRecipients(), request)
                 .subscribe();
     }
 
-    private void ScheduleTemplateSend()
-    {
-
-    }
 }

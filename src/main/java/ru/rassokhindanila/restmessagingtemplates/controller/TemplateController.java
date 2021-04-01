@@ -13,9 +13,9 @@ import ru.rassokhindanila.restmessagingtemplates.Urls;
 import ru.rassokhindanila.restmessagingtemplates.dto.Response;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
-import ru.rassokhindanila.restmessagingtemplates.dto.WebClientResponse;
+import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
-import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
@@ -97,7 +97,7 @@ public class TemplateController {
                                         new Response("Sending")
                                 )
                         );
-                    } catch (WebClientException e) {
+                    } catch (SenderException e) {
                         logger.error(e.getMessage());
                         response.set(
                                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -130,9 +130,9 @@ public class TemplateController {
      * @return Always HTTP 200
      */
     @PostMapping("/test")
-    public ResponseEntity<WebClientResponse> testEndPoint(@RequestBody String message)
+    public ResponseEntity<SenderResponse> testEndPoint(@RequestBody String message)
     {
-        return ResponseEntity.ok(new WebClientResponse("GOT MESSAGE: "+message));
+        return ResponseEntity.ok(new SenderResponse("GOT MESSAGE: "+message));
     }
 
 }

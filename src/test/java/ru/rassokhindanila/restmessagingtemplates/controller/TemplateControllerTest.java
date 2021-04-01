@@ -7,8 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
+import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
+import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 
 import java.util.HashSet;
@@ -39,7 +41,7 @@ public class TemplateControllerTest {
     public void addEmptyEndpointsList() throws Exception
     {
         TemplateDto dto = new TemplateDto();
-        Set<String> endpoints = new HashSet<>();
+        Set<Receiver> endpoints = new HashSet<>();
         dto.setRecipients(endpoints);
         dto.setTemplate("Test template");
         dto.setTemplateId("TemplateID");
@@ -80,8 +82,8 @@ public class TemplateControllerTest {
     public void addTemplate() throws Exception
     {
         TemplateDto dto = new TemplateDto();
-        Set<String> endpoints = new HashSet<>();
-        endpoints.add("http://localhost:8080/testendpoint");
+        Set<Receiver> endpoints = new HashSet<>();
+        endpoints.add(new Receiver(ReceiverType.POST, "http://localhost:8080/testendpoint"));
         dto.setRecipients(endpoints);
         dto.setTemplate("Test template");
         dto.setTemplateId("TemplateID");

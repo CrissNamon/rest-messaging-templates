@@ -3,14 +3,14 @@ package ru.rassokhindanila.restmessagingtemplates.exception;
 /**
  * Represents exception which raised on WebClient error
  */
-public class WebClientException extends Exception{
+public class SenderException extends Exception{
 
-    public WebClientException()
+    public SenderException()
     {
         super();
     }
 
-    public WebClientException(String message)
+    public SenderException(String message)
     {
         super(message);
     }
