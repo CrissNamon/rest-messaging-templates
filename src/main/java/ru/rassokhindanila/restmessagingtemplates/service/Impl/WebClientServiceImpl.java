@@ -13,7 +13,6 @@ import ru.rassokhindanila.restmessagingtemplates.service.WebClientService;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -45,16 +44,6 @@ public class WebClientServiceImpl implements WebClientService {
             logger.error(e.getMessage());
             throw new WebClientException(e.getMessage());
         }
-    }
-
-    @Override
-    public Flux<WebClientResponse> postMany(HashMap<String, Object> data) throws WebClientException{
-        List<Mono<WebClientResponse>> responseList = new ArrayList<>();
-        for(String url : data.keySet())
-        {
-            responseList.add(post(url, data.get(url)));
-        }
-        return Flux.merge(responseList);
     }
 
     @Override

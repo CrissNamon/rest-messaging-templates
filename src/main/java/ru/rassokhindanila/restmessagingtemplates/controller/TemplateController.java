@@ -20,6 +20,9 @@ import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Controller for templates REST
+ */
 @RestController
 @RequestMapping(Urls.API_PATH + Urls.Template.END_POINT)
 public class TemplateController {
@@ -27,13 +30,19 @@ public class TemplateController {
     @Autowired
     private TemplateService templateService;
 
-    private Logger logger;
+    private final Logger logger;
 
     public TemplateController()
     {
         logger = LoggerFactory.getLogger(TemplateController.class);
     }
 
+    /**
+     * @param templateDto Template DTO
+     * @return HTTP 200 if template successfully added
+     *         HTTP 409 if template with given id already exists
+     *         HTTP 400 if templateDto has wrong data
+     */
     @PostMapping("/add")
     public ResponseEntity<Response> addTemplate(@RequestBody TemplateDto templateDto) {
         if (templateDto == null) {
@@ -46,7 +55,7 @@ public class TemplateController {
                     if(error instanceof DataExistsException)
                     {
                         responseEntity = ResponseEntity
-                                .status(HttpStatus.IM_USED)
+                                .status(HttpStatus.CONFLICT)
                                 .body(
                                         new Response("Template with given id already exists")
                                 );
@@ -62,6 +71,12 @@ public class TemplateController {
         return response.get();
     }
 
+    /**
+     * @param templateDataDto Template data DTO
+     * @return HTTP 200 if template has been successfully used
+     *         HTTP 400 if template data DTO is null
+     *         HTTP 500 if an error has occurred during sending
+     */
     @PostMapping("/use")
     public ResponseEntity<Response> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
         if (templateDataDto == null) {
@@ -79,6 +94,12 @@ public class TemplateController {
                         );
                     } catch (WebClientException e) {
                         logger.error(e.getMessage());
+                        response.set(
+                                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(
+                                        new Response("Sending")
+                                )
+                        );
                     }
                 },
                 () -> response.set(
@@ -97,6 +118,11 @@ public class TemplateController {
         return response.get();
     }
 
+    /**
+     * Just test endpoint
+     * @param message String message
+     * @return Always HTTP 200
+     */
     @PostMapping("/test")
     public ResponseEntity<WebClientResponse> testEndPoint(@RequestBody String message)
     {

@@ -6,15 +6,27 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
+/**
+ * Contains utils for object's fields validation
+ */
 public class ValidationUtils {
+
+    /**
+     * Validates object fields
+     * @param object Object for validation
+     * @return Set of validation errors
+     */
     public static Set<ConstraintViolation<Object>> validate(Object object) {
         ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
         Validator validator = vf.getValidator();
-        Set<ConstraintViolation<Object>> constraintViolations = validator
+        return validator
                 .validate(object);
-        return constraintViolations;
     }
 
+    /**
+     * @param validations Set of validation errors
+     * @return All validation errors in one string
+     */
     public static String getMessages(Set<ConstraintViolation<Object>> validations)
     {
         StringBuilder stringBuilder = new StringBuilder();
