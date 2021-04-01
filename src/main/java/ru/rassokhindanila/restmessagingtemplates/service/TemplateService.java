@@ -8,6 +8,7 @@ import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Service with operations on templates
@@ -56,5 +57,5 @@ public interface TemplateService {
     * @param variables Map of placeholders and their values
     * @throws WebClientException Raised if an error occurred during sending
     */
-   void sendMessages(@NotNull Template template, HashMap<String, String> variables) throws WebClientException;
+   void sendMessages(@NotNull Template template, Map<String, String> variables) throws WebClientException;
 }

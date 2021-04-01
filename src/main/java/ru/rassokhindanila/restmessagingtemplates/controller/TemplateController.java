@@ -16,6 +16,7 @@ import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.WebClientResponse;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,6 +30,9 @@ public class TemplateController {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    private SavedTemplateService savedTemplateService;
 
     private final Logger logger;
 
@@ -87,6 +91,7 @@ public class TemplateController {
                 template -> {
                     try {
                         templateService.sendMessages(template, templateDataDto.getVariables());
+                        savedTemplateService.save(templateDataDto);
                         response.set(
                                 ResponseEntity.ok(
                                         new Response("Sending")
@@ -117,6 +122,7 @@ public class TemplateController {
         );
         return response.get();
     }
+
 
     /**
      * Just test endpoint

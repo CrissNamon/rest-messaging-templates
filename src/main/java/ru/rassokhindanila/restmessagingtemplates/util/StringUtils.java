@@ -17,7 +17,7 @@ public class StringUtils {
      * @param variables Map of placeholders and their values
      * @return String with replaced placeholders
      */
-    public static String replaceVariables(String template, HashMap<String, String> variables)
+    public static String replaceVariables(String template, Map<String, String> variables)
     {
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             template = template.replace("$"+entry.getKey()+"$", entry.getValue());
