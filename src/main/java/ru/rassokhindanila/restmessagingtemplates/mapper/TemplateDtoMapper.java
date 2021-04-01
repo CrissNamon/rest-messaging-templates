@@ -8,5 +8,5 @@ import ru.rassokhindanila.restmessagingtemplates.model.Template;
 @Mapper(componentModel = "spring")
 public interface TemplateDtoMapper {
     TemplateDtoMapper INSTANCE = Mappers.getMapper(TemplateDtoMapper.class);
-    Template dtoToTemplate(TemplateDto templateDto);
+    Template toTemplate(TemplateDto templateDto);
 }

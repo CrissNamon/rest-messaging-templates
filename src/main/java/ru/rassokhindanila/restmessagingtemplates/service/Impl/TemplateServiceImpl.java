@@ -1,19 +1,26 @@
 package ru.rassokhindanila.restmessagingtemplates.service.Impl;
 
+import com.sun.istack.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
+import ru.rassokhindanila.restmessagingtemplates.dto.WebClientRequest;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
+import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.mapper.TemplateDtoMapper;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 import ru.rassokhindanila.restmessagingtemplates.repository.TemplateRepository;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
+import ru.rassokhindanila.restmessagingtemplates.service.WebClientService;
+import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
 import javax.validation.ConstraintViolation;
+import java.util.HashMap;
 import java.util.Set;
 
 @Service
@@ -21,6 +28,9 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
     private TemplateRepository templateRepository;
+
+    @Autowired
+    private WebClientService webClientService;
 
     private final Logger logger;
 
@@ -32,8 +42,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void save(TemplateDto templateDto,
                      VoidParamFunctional<? super Exception> onError,
-                     VoidParamFunctional<Template> onSuccess,
-                     VoidParamFunctional<Template> onDuplicate) {
+                     VoidParamFunctional<Template> onSuccess) {
         Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDto);
         if(!validation.isEmpty())
         {
@@ -42,14 +51,15 @@ public class TemplateServiceImpl implements TemplateService {
             );
             return;
         }
-        Template template = TemplateDtoMapper.INSTANCE.dtoToTemplate(templateDto);
-        Template isExists = find(
+        Template template = TemplateDtoMapper.INSTANCE.toTemplate(templateDto);
+        boolean isExists = isExists(
                 templateDto.getTemplateId()
         );
-        if(isExists != null)
+        if(isExists)
         {
-            onDuplicate.action(isExists);
-            logger.error("An error occurred while during template saving: Template with given id already exist");
+            onError.action(
+                    new Exception("Template with given id exists")
+            );
             return;
         }
         try {
@@ -66,5 +76,41 @@ public class TemplateServiceImpl implements TemplateService {
     public Template find(String id)
     {
         return templateRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void findAndProceed(String id,
+                               VoidParamFunctional<Template> found,
+                               VoidFunctional notFound,
+                               VoidParamFunctional<? super Exception> onError)
+    {
+        if(id == null)
+        {
+            onError.action(new NullPointerException("Template id can't be null"));
+            return;
+        }
+        Template search = find(id);
+        if(search == null)
+        {
+            notFound.action();
+            return;
+        }
+        found.action(search);
+    }
+
+    @Override
+    public boolean isExists(String id)
+    {
+        return templateRepository.existsById(id);
+    }
+
+    @Override
+    public void sendMessages(@NotNull Template template, HashMap<String, String> variables) throws WebClientException
+    {
+        String message = template.getTemplate();
+        String updatedMessage = StringUtils.replaceVariables(message, variables);
+        WebClientRequest request = new WebClientRequest(updatedMessage);
+        webClientService.postMany(template.getRecipients(), request)
+                .subscribe();
     }
 }
