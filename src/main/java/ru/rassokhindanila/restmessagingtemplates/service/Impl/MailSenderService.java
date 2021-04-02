@@ -53,6 +53,7 @@ public class MailSenderService implements SenderService {
             message.setText(data);
             getJavaMailSender().send(message);
             SenderResponse senderResponse = new SenderResponse("Email sent");
+            senderResponse.setDestination(address);
             return Mono.just(senderResponse);
         } catch (MailException e)
         {

@@ -67,6 +67,12 @@ public class WebSenderService implements SenderService {
             logger.info("SENDING MESSAGE "+data.toString()+" TO "+url);
             try {
                 Mono<SenderResponse> responseMono = post(url, data);
+                responseMono = responseMono.flatMap(
+                        mono -> {
+                            mono.setDestination(url);
+                            return Mono.just(mono);
+                        }
+                );
                 responseList.add(
                         responseMono
                 );

@@ -16,6 +16,8 @@ public class SenderResponse {
      */
     private String message;
 
+    private String destination;
+
     /**
      * Response exception. Null if no exception
      */

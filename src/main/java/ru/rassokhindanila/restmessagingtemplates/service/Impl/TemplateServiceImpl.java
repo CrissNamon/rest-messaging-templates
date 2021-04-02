@@ -134,7 +134,8 @@ public class TemplateServiceImpl implements TemplateService {
                             sortedReceivers.get(receiverType),
                             request,
                             response -> {
-                                logger.info("WebSenderService response: "+response.getMessage());
+                                logger.info("WebSenderService response: "+response.getMessage()+" from "
+                                + response.getDestination());
                                 onResponse.action(response);
                             }
                     );
@@ -144,7 +145,8 @@ public class TemplateServiceImpl implements TemplateService {
                             sortedReceivers.get(receiverType),
                             request,
                             response -> {
-                                logger.info("MailSenderService response: "+response.getMessage());
+                                logger.info("MailSenderService response: "+response.getMessage()+" from "
+                                        + response.getDestination());
                                 onResponse.action(response);
                             }
                     );
