@@ -10,7 +10,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MailSenderService implements SenderService {
@@ -81,6 +81,7 @@ public class MailSenderService implements SenderService {
 
     @Override
     public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
+        receivers = filterValidReceivers(receivers);
         List<Mono<SenderResponse>> responseList = new ArrayList<>();
         for(Receiver receiver : receivers)
         {
@@ -105,6 +106,13 @@ public class MailSenderService implements SenderService {
     @Override
     public boolean canBeSent(Receiver receiver) {
         return receiver.getReceiverType() == ReceiverType.MAIL;
+    }
+
+    @Override
+    public Set<Receiver> filterValidReceivers(Set<Receiver> receivers) {
+        return receivers.stream()
+                .filter(this::canBeSent)
+                .collect(Collectors.toSet());
     }
 
     /**

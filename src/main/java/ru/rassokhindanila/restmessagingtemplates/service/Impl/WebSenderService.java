@@ -92,11 +92,7 @@ public class WebSenderService implements SenderService {
 
     @Override
     public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
-
-        receivers = receivers.stream()
-                .filter(this::canBeSent)
-                .collect(Collectors.toSet());
-        
+        receivers = filterValidReceivers(receivers);
         Set<String> urls = new HashSet<>();
         receivers.forEach(receiver -> urls.add(receiver.getDestination()));
         return postMany(urls, data);
@@ -105,6 +101,13 @@ public class WebSenderService implements SenderService {
     @Override
     public boolean canBeSent(Receiver receiver) {
         return receiver.getReceiverType() == ReceiverType.POST;
+    }
+
+    @Override
+    public Set<Receiver> filterValidReceivers(Set<Receiver> receivers) {
+        return receivers.stream()
+                .filter(this::canBeSent)
+                .collect(Collectors.toSet());
     }
 
 

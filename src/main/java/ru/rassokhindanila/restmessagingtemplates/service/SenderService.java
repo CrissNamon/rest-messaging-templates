@@ -36,4 +36,10 @@ public interface SenderService {
      */
     boolean canBeSent(Receiver receiver);
 
+    /**
+     * @param receivers Set of receiver
+     * @return Set of valid receivers for this Service only
+     */
+    Set<Receiver> filterValidReceivers(Set<Receiver> receivers);
+
 }

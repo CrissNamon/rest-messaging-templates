@@ -17,6 +17,6 @@ This repository contains spring rest service for sending templated messages to d
 
 ## Examples
 - Add template request:
-    - {"templateId": "internshipRequest","template": "Hello $name$! Jetbrains Internship in $TEAM$NAME$ team.","recipients": [{"destination": "deus.ex.00@mail.ru", "receiver_type":"MAIL"}, {"destination": "http://localhost:8080/testendpoint", "receiver_type":"POST"}]}
+    - {"templateId": "internshipRequest","template": "Hello $name$! Jetbrains Internship in $TEAM$NAME$ team.","recipients": [{"destination": "test@gmail.ru", "receiver_type":"MAIL"}, {"destination": "http://localhost:8080/testendpoint", "receiver_type":"POST"}]}
 - Use template request:
     - {"templateId": "internshipRequest", "variables": {"TEAM$NAME": "Analytics Platform", "name":"Danila"}}
