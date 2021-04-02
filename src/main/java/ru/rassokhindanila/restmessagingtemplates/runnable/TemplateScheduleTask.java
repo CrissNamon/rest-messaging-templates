@@ -2,6 +2,7 @@ package ru.rassokhindanila.restmessagingtemplates.runnable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
@@ -15,6 +16,7 @@ import javax.transaction.Transactional;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class TemplateScheduleTask implements Runnable{
 

@@ -133,7 +133,6 @@ public class TemplateController {
         return ResponseEntity.ok(new Response(message));
     }
 
-
     /**
      * Handles deserialize exception
      */

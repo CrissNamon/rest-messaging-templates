@@ -66,6 +66,8 @@ public class MailSenderService implements SenderService {
         try {
             sendEmail(receiver.getDestination(),
                     StringUtils.toJson(data)
+            ).subscribe(
+                    onResponse::action
             );
         } catch (JsonProcessingException e) {
             throw new SenderException("Serialization exception");

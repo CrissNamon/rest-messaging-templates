@@ -70,7 +70,6 @@ public class WebSenderService implements SenderService {
                 responseList.add(
                         responseMono
                 );
-                //responseMono.subscribe();
             }catch(SenderException e)
             {
                 logger.error("An error occurred. "+e.getMessage());
