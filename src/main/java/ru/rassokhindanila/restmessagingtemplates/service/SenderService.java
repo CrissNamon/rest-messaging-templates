@@ -29,4 +29,11 @@ public interface SenderService {
      */
     Flux<SenderResponse> send(Set<Receiver> receivers, Object data) throws SenderException;
 
+
+    /**
+     * @param receiver Message receiver
+     * @return true if message can be sent to receiver of specified type
+     */
+    boolean canBeSent(Receiver receiver);
+
 }

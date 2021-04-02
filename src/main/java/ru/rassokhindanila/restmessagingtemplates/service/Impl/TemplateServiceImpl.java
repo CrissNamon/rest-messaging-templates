@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderRequest;
+import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
@@ -21,6 +23,8 @@ import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
 import javax.validation.ConstraintViolation;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +36,11 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Qualifier("webSenderService")
     @Autowired
-    private SenderService senderService;
+    private SenderService webSenderService;
+
+    @Qualifier("mailSenderService")
+    @Autowired
+    private SenderService mailSenderService;
 
     private final Logger logger;
 
@@ -112,8 +120,42 @@ public class TemplateServiceImpl implements TemplateService {
         String message = template.getTemplate();
         String updatedMessage = StringUtils.replaceVariables(message, variables);
         SenderRequest request = new SenderRequest(updatedMessage);
-        senderService.send(template.getRecipients(), request)
-                .subscribe();
+        Map<ReceiverType, Set<Receiver>> sortedReceivers = sortReceivers(template.getRecipients());
+        for(ReceiverType receiverType : sortedReceivers.keySet())
+        {
+            switch(receiverType)
+            {
+                case POST:
+                    webSenderService.send(
+                            sortedReceivers.get(receiverType),
+                            request
+                    );
+                    break;
+                case MAIL:
+                    mailSenderService.send(
+                            sortedReceivers.get(receiverType),
+                            request
+                    );
+                    break;
+            }
+        }
+
+    }
+
+    private Map<ReceiverType, Set<Receiver>> sortReceivers(Set<Receiver> receivers)
+    {
+        Map<ReceiverType, Set<Receiver>> sorted = new HashMap<>();
+        receivers.forEach(receiver -> {
+            if(sorted.containsKey(receiver.getReceiverType()))
+            {
+                sorted.get(receiver.getReceiverType()).add(receiver);
+            }else{
+                HashSet<Receiver> receiverHashSet = new HashSet<>();
+                receiverHashSet.add(receiver);
+                sorted.put(receiver.getReceiverType(), receiverHashSet);
+            }
+        });
+        return sorted;
     }
 
 }
