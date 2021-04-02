@@ -135,9 +135,9 @@ public class TemplateController {
      * @return Always HTTP 200
      */
     @PostMapping("/test")
-    public ResponseEntity<SenderResponse> testEndPoint(@RequestBody String message)
+    public ResponseEntity<Response> testEndPoint(@RequestBody String message)
     {
-        return ResponseEntity.ok(new SenderResponse(message));
+        return ResponseEntity.ok(new Response(message));
     }
 
 

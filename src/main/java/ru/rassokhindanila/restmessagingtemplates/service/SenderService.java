@@ -5,6 +5,7 @@ import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 
 import java.util.Set;
 
@@ -19,7 +20,7 @@ public interface SenderService {
      * @return Response of request
      * @throws SenderException Raised if an error occurred during request
      */
-    Mono<SenderResponse> send(Receiver receiver, Object data) throws SenderException;
+    void send(Receiver receiver, Object data, VoidParamFunctional<SenderResponse> onResponse) throws SenderException;
 
     /**
      * @param receivers Set of receiver objects
@@ -27,7 +28,7 @@ public interface SenderService {
      * @return Response of request
      * @throws SenderException Raised if an error occurred during request
      */
-    Flux<SenderResponse> send(Set<Receiver> receivers, Object data) throws SenderException;
+    void send(Set<Receiver> receivers, Object data, VoidParamFunctional<SenderResponse> onResponse) throws SenderException;
 
 
     /**

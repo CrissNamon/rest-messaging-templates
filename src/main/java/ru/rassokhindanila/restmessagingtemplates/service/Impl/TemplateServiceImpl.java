@@ -129,13 +129,15 @@ public class TemplateServiceImpl implements TemplateService {
                 case POST:
                     webSenderService.send(
                             sortedReceivers.get(receiverType),
-                            request
+                            request,
+                            response -> logger.info("WebSenderService response: "+response.getMessage())
                     );
                     break;
                 case MAIL:
                     mailSenderService.send(
                             sortedReceivers.get(receiverType),
-                            request
+                            request,
+                            response -> logger.info("MailSenderService response: "+response.getMessage())
                     );
                     break;
             }

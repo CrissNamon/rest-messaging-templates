@@ -16,6 +16,8 @@ import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.functional.Functional;
+import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 
@@ -69,9 +71,9 @@ public class MailSenderService implements SenderService {
     }
 
     @Override
-    public Mono<SenderResponse> send(Receiver receiver, Object data) throws SenderException {
+    public void send(Receiver receiver, Object data, VoidParamFunctional<SenderResponse> onResponse) throws SenderException {
         try {
-            return sendEmail(receiver.getDestination(),
+            sendEmail(receiver.getDestination(),
                     StringUtils.toJson(data)
             );
         } catch (JsonProcessingException e) {
@@ -80,27 +82,21 @@ public class MailSenderService implements SenderService {
     }
 
     @Override
-    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
+    public void send(Set<Receiver> receivers, Object data, VoidParamFunctional<SenderResponse> onResponse) {
         receivers = filterValidReceivers(receivers);
-        List<Mono<SenderResponse>> responseList = new ArrayList<>();
         for(Receiver receiver : receivers)
         {
             try {
                 logger.info("SENDING MESSAGE " + data.toString() + " TO " + receiver.getDestination());
-                responseList.add(
-                        send(receiver, data)
-                );
+                send(receiver, data, onResponse::action);
             }catch(SenderException e)
             {
                 logger.error("An error occurred. "+e.getMessage());
-                responseList.add(
-                        Mono.just(
-                                new SenderResponse(e)
-                        )
+                onResponse.action(
+                        new SenderResponse(e)
                 );
             }
         }
-        return Flux.merge(responseList);
     }
 
     @Override

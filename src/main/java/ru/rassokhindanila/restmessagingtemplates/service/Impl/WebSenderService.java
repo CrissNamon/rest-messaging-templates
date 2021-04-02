@@ -5,12 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 
 import java.net.MalformedURLException;
@@ -69,9 +71,11 @@ public class WebSenderService implements SenderService {
         {
             logger.info("SENDING MESSAGE "+data.toString()+" TO "+url);
             try {
+                Mono<SenderResponse> responseMono = post(url, data);
                 responseList.add(
-                        post(url, data)
+                        responseMono
                 );
+                //responseMono.subscribe();
             }catch(SenderException e)
             {
                 logger.error("An error occurred. "+e.getMessage());
@@ -86,16 +90,22 @@ public class WebSenderService implements SenderService {
     }
 
     @Override
-    public Mono<SenderResponse> send(Receiver receiver, Object data) throws SenderException {
-        return post(receiver.getDestination(), data);
+    public void send(Receiver receiver, Object data, VoidParamFunctional<SenderResponse> onResponse) throws SenderException {
+        post(receiver.getDestination(), data)
+                .subscribe(
+                        onResponse::action
+                );
     }
 
     @Override
-    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
+    public void send(Set<Receiver> receivers, Object data, VoidParamFunctional<SenderResponse> onResponse) {
         receivers = filterValidReceivers(receivers);
         Set<String> urls = new HashSet<>();
         receivers.forEach(receiver -> urls.add(receiver.getDestination()));
-        return postMany(urls, data);
+        postMany(urls, data)
+                .subscribe(
+                        onResponse::action
+                );
     }
 
     @Override
