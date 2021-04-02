@@ -1,7 +1,5 @@
 package ru.rassokhindanila.restmessagingtemplates.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +7,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
 import ru.rassokhindanila.restmessagingtemplates.dto.Response;
-import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
@@ -33,12 +31,8 @@ public class TemplateController {
     @Autowired
     private SavedTemplateService savedTemplateService;
 
-    private final Logger logger;
-
-    public TemplateController()
-    {
-        logger = LoggerFactory.getLogger(TemplateController.class);
-    }
+    @Autowired
+    private LoggerService logger;
 
     /**
      * @param templateDto Template DTO
@@ -128,7 +122,6 @@ public class TemplateController {
         return response.get();
     }
 
-
     /**
      * Just test endpoint
      * @param message String message
@@ -141,7 +134,9 @@ public class TemplateController {
     }
 
 
-
+    /**
+     * Handles deserialize exception
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason="There was an error processing the request body.")
     public void handleMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException exception) {

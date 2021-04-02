@@ -1,7 +1,5 @@
 package ru.rassokhindanila.restmessagingtemplates.service;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;

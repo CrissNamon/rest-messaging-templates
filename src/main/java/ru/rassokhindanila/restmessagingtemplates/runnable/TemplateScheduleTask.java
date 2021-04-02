@@ -2,13 +2,12 @@ package ru.rassokhindanila.restmessagingtemplates.runnable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.model.SavedTemplate;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
+import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
@@ -25,15 +24,18 @@ public class TemplateScheduleTask implements Runnable{
     @Autowired
     private SavedTemplateService savedTemplateService;
 
-    private Logger logger;
+    @Autowired
+    private LoggerService logger;
 
+    /**
+     * Template id
+     */
     private String templateId;
-    private Long savedTemplateId;
 
-    public TemplateScheduleTask()
-    {
-        logger = LoggerFactory.getLogger(TemplateScheduleTask.class);
-    }
+    /**
+     * Saved data id
+     */
+    private Long savedTemplateId;
 
     @Override
     @Transactional

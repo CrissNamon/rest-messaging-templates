@@ -1,25 +1,26 @@
 package ru.rassokhindanila.restmessagingtemplates.service.Impl;
 
 import com.sun.istack.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
-import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderRequest;
+import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
+import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.functional.Functional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.mapper.TemplateDtoMapper;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 import ru.rassokhindanila.restmessagingtemplates.repository.TemplateRepository;
-import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
+import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
+import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
 import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
@@ -43,12 +44,8 @@ public class TemplateServiceImpl implements TemplateService {
     @Autowired
     private SenderService mailSenderService;
 
-    private final Logger logger;
-
-    public TemplateServiceImpl()
-    {
-        logger = LoggerFactory.getLogger(TemplateServiceImpl.class);
-    }
+    @Autowired
+    private LoggerService logger;
 
     @Override
     public void save(TemplateDto templateDto,
@@ -118,6 +115,12 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException
     {
+        sendMessages(template, variables, Functional::consume);
+    }
+
+    @Override
+    public void sendMessages(Template template, Map<String, String> variables,
+                             VoidParamFunctional<SenderResponse> onResponse) throws SenderException {
         String message = template.getTemplate();
         String updatedMessage = StringUtils.replaceVariables(message, variables);
         SenderRequest request = new SenderRequest(updatedMessage);
@@ -130,19 +133,24 @@ public class TemplateServiceImpl implements TemplateService {
                     webSenderService.send(
                             sortedReceivers.get(receiverType),
                             request,
-                            response -> logger.info("WebSenderService response: "+response.getMessage())
+                            response -> {
+                                logger.info("WebSenderService response: "+response.getMessage());
+                                onResponse.action(response);
+                            }
                     );
                     break;
                 case MAIL:
                     mailSenderService.send(
                             sortedReceivers.get(receiverType),
                             request,
-                            response -> logger.info("MailSenderService response: "+response.getMessage())
+                            response -> {
+                                logger.info("MailSenderService response: "+response.getMessage());
+                                onResponse.action(response);
+                            }
                     );
                     break;
             }
         }
-
     }
 
     private Map<ReceiverType, Set<Receiver>> sortReceivers(Set<Receiver> receivers)

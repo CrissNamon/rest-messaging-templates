@@ -1,6 +1,7 @@
 package ru.rassokhindanila.restmessagingtemplates.service;
 
 import com.sun.istack.NotNull;
+import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
@@ -57,4 +58,14 @@ public interface TemplateService {
     * @throws SenderException Raised if an error occurred during sending
     */
    void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException;
+
+   /**
+    * Replaces placeholders in template end sends it to endpoints
+    * @param template Template object
+    * @param variables Map of placeholders and their values
+    * @param onResponse Called on response for each receiver
+    * @throws SenderException Raised if an error occurred during sending
+    */
+   void sendMessages(@NotNull Template template, Map<String, String> variables,
+                     VoidParamFunctional<SenderResponse> onResponse) throws SenderException;
 }

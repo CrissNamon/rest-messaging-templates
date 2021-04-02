@@ -1,11 +1,9 @@
 package ru.rassokhindanila.restmessagingtemplates.service.Impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
@@ -13,6 +11,7 @@ import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
+import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 
 import java.net.MalformedURLException;
@@ -26,12 +25,8 @@ import java.util.stream.Collectors;
 @Service
 public class WebSenderService implements SenderService {
 
-    private final Logger logger;
-
-    public WebSenderService()
-    {
-        logger = LoggerFactory.getLogger(WebSenderService.class);
-    }
+    @Autowired
+    private LoggerService logger;
 
     /**
      * Makes post request
