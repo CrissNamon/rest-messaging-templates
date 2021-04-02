@@ -137,6 +137,8 @@ public class TemplateController {
         return ResponseEntity.ok(new SenderResponse("GOT MESSAGE: "+message));
     }
 
+
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="There was an error processing the request body.")
     public void handleMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException exception) {
