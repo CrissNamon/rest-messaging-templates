@@ -10,8 +10,7 @@ This repository contains spring rest service for sending templated messages to d
         - receiver_type: ReceiverType - Receiver type (MAIL, POST)
         - destination: String - Receiver destination
 - **/api/v1/template/use**
-<br>
-Accepts TemplateDataDto:
+<br>Accepts TemplateDataDto:
     - templateId: String - Template identifier
     - variables: Map<String, String> - Map of variables and their values
     - minutes: int - Scheduler. If greater than 0, then data will be sent every x minutes
