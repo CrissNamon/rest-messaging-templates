@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashMap;
@@ -31,4 +32,10 @@ public class TemplateDataDto {
     @NotNull
     @NotBlank(message = "Template variables required")
     private HashMap<String, String> variables;
+
+    /**
+     * Schedule
+     */
+    @Min(value = 0, message = "Schedule can't be negative")
+    private int minutes;
 }

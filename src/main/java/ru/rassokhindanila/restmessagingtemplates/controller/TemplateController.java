@@ -5,19 +5,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.*;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
 import ru.rassokhindanila.restmessagingtemplates.dto.Response;
+import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
-import ru.rassokhindanila.restmessagingtemplates.dto.WebClientResponse;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
-import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
+import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -29,6 +29,9 @@ public class TemplateController {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    private SavedTemplateService savedTemplateService;
 
     private final Logger logger;
 
@@ -87,12 +90,13 @@ public class TemplateController {
                 template -> {
                     try {
                         templateService.sendMessages(template, templateDataDto.getVariables());
+                        savedTemplateService.save(templateDataDto);
                         response.set(
                                 ResponseEntity.ok(
                                         new Response("Sending")
                                 )
                         );
-                    } catch (WebClientException e) {
+                    } catch (SenderException e) {
                         logger.error(e.getMessage());
                         response.set(
                                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -118,15 +122,22 @@ public class TemplateController {
         return response.get();
     }
 
+
     /**
      * Just test endpoint
      * @param message String message
      * @return Always HTTP 200
      */
     @PostMapping("/test")
-    public ResponseEntity<WebClientResponse> testEndPoint(@RequestBody String message)
+    public ResponseEntity<SenderResponse> testEndPoint(@RequestBody String message)
     {
-        return ResponseEntity.ok(new WebClientResponse("GOT MESSAGE: "+message));
+        return ResponseEntity.ok(new SenderResponse("GOT MESSAGE: "+message));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="There was an error processing the request body.")
+    public void handleMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException exception) {
+        logger.error("Can't deserialize request: "+exception.getMessage());
     }
 
 }

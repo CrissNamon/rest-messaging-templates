@@ -1,6 +1,7 @@
 package ru.rassokhindanila.restmessagingtemplates.model;
 
 import lombok.Data;
+import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -30,6 +31,6 @@ public class Template {
      * Template endpoints
      */
     @ElementCollection
-    private Set<String> recipients;
+    private Set<Receiver> recipients;
 
 }

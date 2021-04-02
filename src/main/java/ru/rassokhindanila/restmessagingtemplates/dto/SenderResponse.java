@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents request for WebClient
+ * Represents response from WebClient
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebClientRequest {
+public class SenderResponse {
     /**
-     * Request message
+     * Response message
      */
     private String message;
 }

@@ -2,12 +2,12 @@ package ru.rassokhindanila.restmessagingtemplates.service;
 
 import com.sun.istack.NotNull;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
-import ru.rassokhindanila.restmessagingtemplates.exception.WebClientException;
+import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.model.Template;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Service with operations on templates
@@ -54,7 +54,7 @@ public interface TemplateService {
     * Replaces placeholders in template end sends it to endpoints
     * @param template Template object
     * @param variables Map of placeholders and their values
-    * @throws WebClientException Raised if an error occurred during sending
+    * @throws SenderException Raised if an error occurred during sending
     */
-   void sendMessages(@NotNull Template template, HashMap<String, String> variables) throws WebClientException;
+   void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException;
 }
