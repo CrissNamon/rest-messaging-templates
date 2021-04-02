@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
+import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
@@ -37,13 +38,23 @@ public class MailSenderService implements SenderService {
     @Autowired
     private Environment environment;
 
+    /**
+     * @param address Email address
+     * @param data Data to send
+     * @return SenderResponse of sending result
+     * @throws SenderException Raised if an error occurred
+     */
     private Mono<SenderResponse> sendEmail(String address, String data) throws SenderException
     {
+        String from = environment.getProperty("senderservice.mail.from");
+        if(from == null)
+        {
+            logger.error("application.properties should contain senderservice.mail.from value");
+            throw new SenderException("Server error");
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(
-                    environment.getProperty("senderservice.mail.from")
-            );
+            message.setFrom(from);
             message.setTo(address);
             message.setSubject("Data");
             message.setText(data);
@@ -52,7 +63,7 @@ public class MailSenderService implements SenderService {
             return Mono.just(senderResponse);
         } catch (MailException e)
         {
-            logger.error("Error occurred");
+            logger.error("Error occurred while mail sending: "+e.getMessage());
             throw new SenderException("Error occurred while mail sending");
         }
     }
@@ -74,23 +85,21 @@ public class MailSenderService implements SenderService {
         for(Receiver receiver : receivers)
         {
             logger.info("SENDING MESSAGE "+data.toString()+" TO "+receiver.getDestination());
-            try {
-                responseList.add(
-                      send(receiver, data)
-                );
-            }catch(WebClientException e)
-            {
-                logger.error("GOT EXCEPTION IN POSTMANY");
-            }
+            responseList.add(
+                    send(receiver, data)
+            );
         }
         return Flux.merge(responseList);
     }
 
     @Override
     public boolean canBeSent(Receiver receiver) {
-        return false;
+        return receiver.getReceiverType() == ReceiverType.MAIL;
     }
 
+    /**
+     * @return JavaMailSender
+     */
     private JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(

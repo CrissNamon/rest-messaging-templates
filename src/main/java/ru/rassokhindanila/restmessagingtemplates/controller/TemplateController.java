@@ -83,7 +83,10 @@ public class TemplateController {
     @PostMapping("/use")
     public ResponseEntity<Response> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
         if (templateDataDto == null) {
-            return ResponseEntity.badRequest().body(new Response("Template id and data required"));
+            return ResponseEntity.badRequest()
+                    .body(
+                            new Response("Template id and data required")
+                    );
         }
         AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
         templateService.findAndProceed(templateDataDto.getTemplateId(),
@@ -104,7 +107,7 @@ public class TemplateController {
                         response.set(
                                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(
-                                        new Response("Sending")
+                                        new Response("An Error occurred during sending: "+e.getMessage())
                                 )
                         );
                     }
@@ -134,13 +137,13 @@ public class TemplateController {
     @PostMapping("/test")
     public ResponseEntity<SenderResponse> testEndPoint(@RequestBody String message)
     {
-        return ResponseEntity.ok(new SenderResponse("GOT MESSAGE: "+message));
+        return ResponseEntity.ok(new SenderResponse(message));
     }
 
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="There was an error processing the request body.")
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason="There was an error processing the request body.")
     public void handleMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException exception) {
         logger.error("Can't deserialize request: "+exception.getMessage());
     }

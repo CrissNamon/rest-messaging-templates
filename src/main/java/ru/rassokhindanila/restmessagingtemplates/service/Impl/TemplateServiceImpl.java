@@ -10,6 +10,7 @@ import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderRequest;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
+import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
@@ -68,7 +69,7 @@ public class TemplateServiceImpl implements TemplateService {
         if(isExists)
         {
             onError.action(
-                    new Exception("Template with given id exists")
+                    new DataExistsException("Template with given id exists")
             );
             return;
         }
