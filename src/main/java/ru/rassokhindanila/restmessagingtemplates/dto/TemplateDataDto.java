@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents template data
@@ -28,7 +28,7 @@ public class TemplateDataDto {
      */
     @NotNull
     @NotBlank(message = "Template variables required")
-    private HashMap<String, String> variables;
+    private Map<String, String> variables;
 
     /**
      * Schedule

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents response from WebClient
+ * Represents response from SenderService
  */
 @Data
 @AllArgsConstructor
@@ -15,4 +15,19 @@ public class SenderResponse {
      * Response message
      */
     private String message;
+
+    /**
+     * Response exception. Null if no exception
+     */
+    private Exception exception;
+
+    public SenderResponse(String message)
+    {
+        setMessage(message);
+    }
+
+    public SenderResponse(Exception e)
+    {
+        setException(e);
+    }
 }

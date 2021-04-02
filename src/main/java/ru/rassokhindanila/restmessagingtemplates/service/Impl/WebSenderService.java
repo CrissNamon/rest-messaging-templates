@@ -62,18 +62,24 @@ public class WebSenderService implements SenderService {
      * @param urls Destination urls
      * @param data Object to send
      * @return Response of request
-     * @throws SenderException Raised if an error occurred
      */
-    private Flux<SenderResponse> postMany(Set<String> urls, Object data) throws SenderException {
+    private Flux<SenderResponse> postMany(Set<String> urls, Object data) {
         List<Mono<SenderResponse>> responseList = new ArrayList<>();
         for(String url : urls)
         {
             logger.info("SENDING MESSAGE "+data.toString()+" TO "+url);
             try {
-                responseList.add(post(url, data));
-            }catch(WebClientException e)
+                responseList.add(
+                        post(url, data)
+                );
+            }catch(SenderException e)
             {
-                logger.error("GOT EXCEPTION IN POSTMANY");
+                logger.error("An error occurred. "+e.getMessage());
+                responseList.add(
+                        Mono.just(
+                                new SenderResponse(e)
+                        )
+                );
             }
         }
         return Flux.merge(responseList);
@@ -85,7 +91,7 @@ public class WebSenderService implements SenderService {
     }
 
     @Override
-    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) throws SenderException {
+    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
 
         receivers = receivers.stream()
                 .filter(this::canBeSent)

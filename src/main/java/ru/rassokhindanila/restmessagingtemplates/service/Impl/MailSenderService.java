@@ -80,14 +80,24 @@ public class MailSenderService implements SenderService {
     }
 
     @Override
-    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) throws SenderException {
+    public Flux<SenderResponse> send(Set<Receiver> receivers, Object data) {
         List<Mono<SenderResponse>> responseList = new ArrayList<>();
         for(Receiver receiver : receivers)
         {
-            logger.info("SENDING MESSAGE "+data.toString()+" TO "+receiver.getDestination());
-            responseList.add(
-                    send(receiver, data)
-            );
+            try {
+                logger.info("SENDING MESSAGE " + data.toString() + " TO " + receiver.getDestination());
+                responseList.add(
+                        send(receiver, data)
+                );
+            }catch(SenderException e)
+            {
+                logger.error("An error occurred. "+e.getMessage());
+                responseList.add(
+                        Mono.just(
+                                new SenderResponse(e)
+                        )
+                );
+            }
         }
         return Flux.merge(responseList);
     }
