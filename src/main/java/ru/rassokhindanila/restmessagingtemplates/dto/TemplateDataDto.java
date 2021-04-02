@@ -1,13 +1,10 @@
 package ru.rassokhindanila.restmessagingtemplates.dto;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.HashMap;
 
 /**
@@ -36,6 +33,8 @@ public class TemplateDataDto {
     /**
      * Schedule
      */
+    @NotEmpty
+    @NotNull
     @Min(value = 0, message = "Schedule can't be negative")
     private int minutes;
 }

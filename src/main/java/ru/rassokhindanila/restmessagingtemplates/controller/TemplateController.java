@@ -89,8 +89,11 @@ public class TemplateController {
         templateService.findAndProceed(templateDataDto.getTemplateId(),
                 template -> {
                     try {
-                        templateService.sendMessages(template, templateDataDto.getVariables());
-                        savedTemplateService.save(templateDataDto);
+                        if(templateDataDto.getMinutes() > 0) {
+                            savedTemplateService.save(templateDataDto);
+                        }else{
+                            templateService.sendMessages(template, templateDataDto.getVariables());
+                        }
                         response.set(
                                 ResponseEntity.ok(
                                         new Response("Sending")
