@@ -33,6 +33,9 @@ public class TemplateDataDto {
     @NotBlank(message = "Template variables required")
     private HashMap<String, String> variables;
 
+    /**
+     * Schedule
+     */
     @Min(value = 0, message = "Schedule can't be negative")
     private int minutes;
 }

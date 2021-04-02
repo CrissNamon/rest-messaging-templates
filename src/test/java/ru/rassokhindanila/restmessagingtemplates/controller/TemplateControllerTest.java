@@ -96,4 +96,24 @@ public class TemplateControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void addTemplateWrongReceiverType() throws Exception
+    {
+        String json = "{\n" +
+                "\n" +
+                "\"templateId\": \"TEST_ID\",\n" +
+                "\n" +
+                "\"template\": \"TEST TEMPLATE\",\n" +
+                "\n" +
+                "\"recipients\": [{\"destination\": \"TEST DESTINATION\", \"receiver_type\":\"TEST\"}]\n" +
+                "\n" +
+                "}";
+        mockMvc.perform(
+                post(Urls.API_PATH+Urls.Template.END_POINT+"/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        )
+                .andExpect(status().isBadRequest());
+    }
+
 }

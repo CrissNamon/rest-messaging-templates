@@ -9,13 +9,22 @@ import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
+/**
+ * Represents message receiver
+ */
 @Data
 @NoArgsConstructor
 @Embeddable
 public class Receiver implements Serializable {
 
+    /**
+     * Type of receiver
+     */
     private ReceiverType receiverType;
 
+    /**
+     * Receiver destination
+     */
     private String destination;
 
     @JsonCreator

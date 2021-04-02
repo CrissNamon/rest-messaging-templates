@@ -33,6 +33,6 @@ public class TemplateDto {
     /**
      * Set of endpoints to send message to
      */
-    @NotNull(message = "Template recipients required")
+    @NotEmpty(message = "Template recipients required")
     private Set<Receiver> recipients;
 }

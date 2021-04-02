@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
@@ -16,8 +14,6 @@ import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,6 +31,13 @@ public class WebSenderService implements SenderService {
         logger = LoggerFactory.getLogger(WebSenderService.class);
     }
 
+    /**
+     * Makes post request
+     * @param url Destination url
+     * @param data Object to send
+     * @return Response of request
+     * @throws SenderException Raised if an error occurred
+     */
     private Mono<SenderResponse> post(String url, Object data) throws SenderException {
         try {
             URL parseUrl = new URL(url);
@@ -54,6 +57,13 @@ public class WebSenderService implements SenderService {
         }
     }
 
+    /**
+     * Makes post requests
+     * @param urls Destination urls
+     * @param data Object to send
+     * @return Response of request
+     * @throws SenderException Raised if an error occurred
+     */
     private Flux<SenderResponse> postMany(Set<String> urls, Object data) throws SenderException {
         List<Mono<SenderResponse>> responseList = new ArrayList<>();
         for(String url : urls)
