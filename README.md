@@ -14,3 +14,9 @@ This repository contains spring rest service for sending templated messages to d
     - templateId: String - Template identifier
     - variables: Map<String, String> - Map of variables and their values
     - minutes: int - Scheduler. If greater than 0, then data will be sent every x minutes
+
+## Examples
+- Add template request:
+    - {"templateId": "internshipRequest","template": "Hello $name$! Jetbrains Internship in $TEAM$NAME$ team.","recipients": [{"destination": "deus.ex.00@mail.ru", "receiver_type":"MAIL"}, {"destination": "http://localhost:8080/testendpoint", "receiver_type":"POST"}]}
+- Use template request:
+    - {"templateId": "internshipRequest", "variables": {"TEAM$NAME": "Analytics Platform", "name":"Danila"}}
