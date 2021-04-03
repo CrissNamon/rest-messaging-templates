@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
 import ru.rassokhindanila.restmessagingtemplates.dto.Response;
+import ru.rassokhindanila.restmessagingtemplates.dto.StringRequest;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
@@ -117,6 +118,42 @@ public class TemplateController {
                                 .body(
                                         new Response(error.getMessage())
                                 )
+                )
+        );
+        return response.get();
+    }
+
+    @PostMapping("/update/{id}/")
+    public ResponseEntity<Response> updateMessage(@PathVariable("id") String id, @RequestBody StringRequest request)
+    {
+        if(id == null)
+        {
+            return ResponseEntity.badRequest().body(new Response("Wrong template id"));
+        }
+        if(request == null)
+        {
+            return ResponseEntity.badRequest().body(new Response("Request can't be null"));
+        }
+        if(request.getValue() == null)
+        {
+            return ResponseEntity.badRequest().body(new Response("Request value can't be null"));
+        }
+        AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
+        templateService.updateTemplateMessage(id, request.getValue(),
+                () -> response.set(
+                        ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                                new Response("Template with given id not found")
+                        )
+                ),
+                error -> response.set(
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                                new Response("An error occurred")
+                        )
+                ),
+                () -> response.set(
+                        ResponseEntity.ok().body(
+                                new Response("Updated")
+                        )
                 )
         );
         return response.get();

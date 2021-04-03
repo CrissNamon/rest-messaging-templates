@@ -81,7 +81,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Template find(String id)
+    public Template find(@NotNull String id)
     {
         return templateRepository.findById(id).orElse(null);
     }
@@ -153,6 +153,25 @@ public class TemplateServiceImpl implements TemplateService {
                     break;
             }
         }
+    }
+
+    @Override
+    public void updateTemplateMessage(String id, String newValue,
+                                      VoidFunctional notFound,
+                                      VoidParamFunctional<? super Exception> onError,
+                                      VoidFunctional onSuccess) {
+        findAndProceed(id,
+                template -> {
+                    template.setTemplate(newValue);
+                    save(template);
+                    onSuccess.action();
+                },
+                notFound,
+                onError);
+    }
+
+    public void save(Template template) {
+        templateRepository.save(template);
     }
 
     private Map<ReceiverType, Set<Receiver>> sortReceivers(Set<Receiver> receivers)

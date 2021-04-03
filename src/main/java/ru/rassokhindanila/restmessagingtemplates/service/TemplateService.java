@@ -68,4 +68,16 @@ public interface TemplateService {
     */
    void sendMessages(@NotNull Template template, Map<String, String> variables,
                      VoidParamFunctional<SenderResponse> onResponse) throws SenderException;
+
+   /**
+    * @param id Template id
+    * @param message New template message
+    * @param notFound Called if template not found
+    * @param onError Called if an error occurred
+    * @param onSuccess Called if template was successfully updated
+    */
+   void updateTemplateMessage(String id, String message,
+                              VoidFunctional notFound,
+                              VoidParamFunctional<? super Exception> onError,
+                              VoidFunctional onSuccess);
 }
