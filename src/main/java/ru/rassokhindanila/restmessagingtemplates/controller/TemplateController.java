@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
 import ru.rassokhindanila.restmessagingtemplates.dto.Response;
 import ru.rassokhindanila.restmessagingtemplates.dto.StringRequest;
@@ -43,6 +44,7 @@ public class TemplateController {
      */
     @PostMapping("/add")
     public ResponseEntity<Response> addTemplate(@RequestBody TemplateDto templateDto) {
+
         if (templateDto == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -76,14 +78,17 @@ public class TemplateController {
      *         HTTP 500 if an error has occurred during sending
      */
     @PostMapping("/use")
-    public ResponseEntity<Response> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
+    public DeferredResult<ResponseEntity<Response>> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
+        DeferredResult<ResponseEntity<Response>> response = new DeferredResult<>();
         if (templateDataDto == null) {
-            return ResponseEntity.badRequest()
+            response.setResult(
+                    ResponseEntity.badRequest()
                     .body(
                             new Response("Template id and data required")
-                    );
+                    )
+            );
+            return response;
         }
-        AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
         templateService.findAndProceed(templateDataDto.getTemplateId(),
                 template -> {
                     try {
@@ -92,14 +97,14 @@ public class TemplateController {
                         }else{
                             templateService.sendMessages(template, templateDataDto.getVariables());
                         }
-                        response.set(
+                        response.setResult(
                                 ResponseEntity.ok(
                                         new Response("Sending")
                                 )
                         );
                     } catch (SenderException e) {
                         logger.error(e.getMessage());
-                        response.set(
+                        response.setResult(
                                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(
                                         new Response("An Error occurred during sending: "+e.getMessage())
@@ -107,20 +112,20 @@ public class TemplateController {
                         );
                     }
                 },
-                () -> response.set(
+                () -> response.setResult(
                         ResponseEntity.status(HttpStatus.NOT_FOUND)
                                 .body(
                                         new Response("Template with given id not found")
                                 )
                 ),
-                error -> response.set(
+                error -> response.setResult(
                         ResponseEntity.badRequest()
                                 .body(
                                         new Response(error.getMessage())
                                 )
                 )
         );
-        return response.get();
+        return response;
     }
 
     @PostMapping("/update/{id}/")
