@@ -54,8 +54,7 @@ public class TemplateScheduleTask implements Runnable{
                     logger.info("USING TEMPLATE: "+savedTemplate.getTemplateId());
                     templateService.sendMessages(template, savedTemplate.getData());
                     logger.info("==============================================================");
-                }catch (SenderException e)
-                {
+                }catch (SenderException e) {
                     logger.error("ERROR OCCURRED DURING SCHEDULED TEMPLATE WITH ID: "+savedTemplateId.toString());
                     logger.error(e.getMessage());
                 }

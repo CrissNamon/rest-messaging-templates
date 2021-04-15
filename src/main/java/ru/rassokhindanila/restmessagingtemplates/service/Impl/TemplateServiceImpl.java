@@ -1,6 +1,5 @@
 package ru.rassokhindanila.restmessagingtemplates.service.Impl;
 
-import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -75,13 +74,13 @@ public class TemplateServiceImpl implements TemplateService {
                     templateRepository.save(template)
             );
         }catch(IllegalArgumentException e) {
-            onError.action(e);
             logger.error("An error occurred while during template saving: "+e.getMessage());
+            onError.action(e);
         }
     }
 
     @Override
-    public Template find(@NotNull String id)
+    public Template find(String id)
     {
         return templateRepository.findById(id).orElse(null);
     }
@@ -94,7 +93,9 @@ public class TemplateServiceImpl implements TemplateService {
     {
         if(id == null)
         {
-            onError.action(new NullPointerException("Template id can't be null"));
+            onError.action(
+                    new NullPointerException("Template id can't be null")
+            );
             return;
         }
         Template search = find(id);
@@ -109,11 +110,15 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public boolean isExists(String id)
     {
+        if(id == null)
+        {
+            return false;
+        }
         return templateRepository.existsById(id);
     }
 
     @Override
-    public void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException
+    public void sendMessages(Template template, Map<String, String> variables) throws SenderException
     {
         sendMessages(template, variables, Functional::consume);
     }
@@ -121,6 +126,10 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void sendMessages(Template template, Map<String, String> variables,
                              VoidParamFunctional<SenderResponse> onResponse) throws SenderException {
+        if(template == null)
+        {
+            throw new SenderException("Template is null");
+        }
         String message = template.getTemplate();
         String updatedMessage = StringUtils.replaceVariables(message, variables);
         SenderRequest request = new SenderRequest(updatedMessage);

@@ -26,14 +26,12 @@ public class TemplateDataDto {
     /**
      * Placeholders and their values
      */
-    @NotNull
-    @NotBlank(message = "Template variables required")
+    @NotNull(message = "Template variables required")
     private Map<String, String> variables;
 
     /**
      * Schedule
      */
-    @NotEmpty
     @NotNull
     @Min(value = 0, message = "Schedule can't be negative")
     private int minutes;

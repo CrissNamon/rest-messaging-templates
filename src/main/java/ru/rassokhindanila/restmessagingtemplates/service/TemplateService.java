@@ -1,6 +1,5 @@
 package ru.rassokhindanila.restmessagingtemplates.service;
 
-import com.sun.istack.NotNull;
 import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
@@ -30,14 +29,14 @@ public interface TemplateService {
     * @param id Template id to search
     * @return Template if found or null if not
     */
-   Template find(@NotNull String id);
+   Template find(String id);
 
    /**
     * Search for template without returning it
     * @param id Template id to search
     * @return true if template with given id exists
     */
-   boolean isExists(@NotNull String id);
+   boolean isExists(String id);
 
    /**
     * Search for template and proceed some action on it
@@ -46,7 +45,7 @@ public interface TemplateService {
     * @param notFound Called if template with given id not found
     * @param onError Called if an error occurred, returns Exception
     */
-   void findAndProceed(@NotNull String id,
+   void findAndProceed(String id,
                        VoidParamFunctional<Template> found,
                        VoidFunctional notFound,
                        VoidParamFunctional<? super Exception> onError);
@@ -57,7 +56,7 @@ public interface TemplateService {
     * @param variables Map of placeholders and their values
     * @throws SenderException Raised if an error occurred during sending
     */
-   void sendMessages(@NotNull Template template, Map<String, String> variables) throws SenderException;
+   void sendMessages(Template template, Map<String, String> variables) throws SenderException;
 
    /**
     * Replaces placeholders in template end sends it to endpoints
@@ -66,7 +65,7 @@ public interface TemplateService {
     * @param onResponse Called on response for each receiver
     * @throws SenderException Raised if an error occurred during sending
     */
-   void sendMessages(@NotNull Template template, Map<String, String> variables,
+   void sendMessages(Template template, Map<String, String> variables,
                      VoidParamFunctional<SenderResponse> onResponse) throws SenderException;
 
    /**

@@ -16,8 +16,11 @@ import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
+import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -80,11 +83,12 @@ public class TemplateController {
     @PostMapping("/use")
     public DeferredResult<ResponseEntity<Response>> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
         DeferredResult<ResponseEntity<Response>> response = new DeferredResult<>();
-        if (templateDataDto == null) {
+        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDataDto);
+        if (!validation.isEmpty()) {
             response.setResult(
                     ResponseEntity.badRequest()
                     .body(
-                            new Response("Template id and data required")
+                            new Response(ValidationUtils.getMessages(validation))
                     )
             );
             return response;

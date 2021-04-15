@@ -36,4 +36,9 @@ public class ValidationUtils {
         });
         return stringBuilder.toString();
     }
+
+    public static boolean isValid(Object object)
+    {
+        return validate(object).isEmpty();
+    }
 }

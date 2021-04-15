@@ -6,9 +6,9 @@ This repository contains spring rest service for sending templated messages to d
 <br>Accepts TemplateDto:
     - templateId: String - Template identifier
     - template: String - String with placeholders like $variable$
-    - recipients: Map<ReceiverType, Set<String>> - Map of receiver objects
-        - ReceiverType: MAIL, POST
-        - Set<String>: Set of destinations
+    - recipients: Set<Receiver> - Set of receiver objects
+        - receiver_type: ReceiverType - Receiver type (MAIL, POST)
+        - destination: String - Receiver destination
 - POST **/api/v1/template/use**
 <br>Accepts TemplateDataDto:
     - templateId: String - Template identifier
@@ -20,7 +20,7 @@ This repository contains spring rest service for sending templated messages to d
 
 ## Examples
 - Add template request:
-    - {"templateId": "internshipRequest","template": "Hello $name$! Jetbrains Internship in $TEAM$NAME$ team.","recipients": {"POST":["http://localhost:8080/api/v1/template/test", "http://localhost:8080/api/v1/template/test2"],"MAIL":["test@gmail.com"]}
+    - {"templateId": "internshipRequest","template": "Hello $name$! Jetbrains Internship in $TEAM$NAME$ team.","recipients": [{"destination": "test@gmail.ru", "receiver_type":"MAIL"}, {"destination": "http://localhost:8080/testendpoint", "receiver_type":"POST"}]}
 - Use template request:
     - {"templateId": "internshipRequest", "variables": {"TEAM$NAME": "Analytics Platform", "name":"Danila"}}
 - Update template message request:
