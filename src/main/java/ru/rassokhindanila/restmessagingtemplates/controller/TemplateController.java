@@ -47,9 +47,14 @@ public class TemplateController {
      */
     @PostMapping("/add")
     public ResponseEntity<Response> addTemplate(@RequestBody TemplateDto templateDto) {
-
-        if (templateDto == null) {
-            return ResponseEntity.badRequest().build();
+        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDto);
+        if(!validation.isEmpty())
+        {
+            return ResponseEntity.badRequest()
+                    .body(new Response(
+                            ValidationUtils.getMessages(validation)
+                        )
+                    );
         }
         AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
         templateService.save(templateDto,
@@ -139,13 +144,13 @@ public class TemplateController {
         {
             return ResponseEntity.badRequest().body(new Response("Wrong template id"));
         }
-        if(request == null)
+        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(request);
+        if(!validation.isEmpty())
         {
-            return ResponseEntity.badRequest().body(new Response("Request can't be null"));
-        }
-        if(request.getValue() == null)
-        {
-            return ResponseEntity.badRequest().body(new Response("Request value can't be null"));
+            return ResponseEntity.badRequest()
+                    .body(
+                            new Response(ValidationUtils.getMessages(validation))
+                    );
         }
         AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
         templateService.updateTemplateMessage(id, request.getValue(),

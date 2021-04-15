@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class StringRequest {
 
-    @NotNull
-    @NotEmpty
+    @NotNull(message = "Value can't be null")
+    @NotEmpty(message = "Value can't be empty")
     private String value;
 
     @JsonCreator

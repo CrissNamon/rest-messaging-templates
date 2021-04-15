@@ -36,7 +36,7 @@ public class TemplateControllerTest {
         mockMvc.perform(
                 post(Urls.API_PATH+Urls.Template.END_POINT+"/add")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{}")
+                .content("")
         )
                 .andExpect(status().isBadRequest());
     }
