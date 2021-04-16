@@ -4,17 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
-import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
+import ru.rassokhindanila.restmessagingtemplates.dto.ValidationResult;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidFunctional;
 import ru.rassokhindanila.restmessagingtemplates.functional.VoidParamFunctional;
 import ru.rassokhindanila.restmessagingtemplates.model.SavedTemplate;
 import ru.rassokhindanila.restmessagingtemplates.repository.SavedTemplateRepository;
 import ru.rassokhindanila.restmessagingtemplates.runnable.TemplateScheduleTask;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
-import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
-
-import javax.validation.ConstraintViolation;
-import java.util.Set;
 
 @Service
 public class SavedTemplateServiceImpl implements SavedTemplateService {
@@ -30,8 +26,8 @@ public class SavedTemplateServiceImpl implements SavedTemplateService {
 
     @Override
     public void save(TemplateDataDto templateDataDto) {
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDataDto);
-        if(!validation.isEmpty())
+        ValidationResult validationResult = new ValidationResult(templateDataDto);
+        if(validationResult.isViolated())
         {
             return;
         }
@@ -49,12 +45,12 @@ public class SavedTemplateServiceImpl implements SavedTemplateService {
     public void save(TemplateDataDto templateDataDto,
                      VoidParamFunctional<? super Throwable> onError,
                      VoidFunctional onSuccess) {
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDataDto);
-        if(!validation.isEmpty())
+        ValidationResult validationResult = new ValidationResult(templateDataDto);
+        if(validationResult.isViolated())
         {
             onError.action(
                     new NullPointerException(
-                            ValidationUtils.getMessages(validation)
+                            validationResult.toString()
                     )
             );
             return;
@@ -68,7 +64,7 @@ public class SavedTemplateServiceImpl implements SavedTemplateService {
         return savedTemplateRepository.findById(id).orElse(null);
     }
 
-    public void scheduleTemplate(SavedTemplate savedTemplate)
+    private void scheduleTemplate(SavedTemplate savedTemplate)
     {
         if(savedTemplate.getMinutes() > 0) {
             templateScheduleTask.setSavedTemplateId(savedTemplate.getId());

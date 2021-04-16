@@ -3,10 +3,7 @@ package ru.rassokhindanila.restmessagingtemplates.service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.rassokhindanila.restmessagingtemplates.dto.Receiver;
-import ru.rassokhindanila.restmessagingtemplates.dto.SenderRequest;
-import ru.rassokhindanila.restmessagingtemplates.dto.SenderResponse;
-import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
+import ru.rassokhindanila.restmessagingtemplates.dto.*;
 import ru.rassokhindanila.restmessagingtemplates.enums.ReceiverType;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.RequestDataException;
@@ -21,9 +18,7 @@ import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SenderService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
 import ru.rassokhindanila.restmessagingtemplates.util.StringUtils;
-import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
-import javax.validation.ConstraintViolation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,11 +45,11 @@ public class TemplateServiceImpl implements TemplateService {
     public void save(TemplateDto templateDto,
                      VoidParamFunctional<? super Exception> onError,
                      VoidParamFunctional<Template> onSuccess) {
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDto);
-        if(!validation.isEmpty())
+        ValidationResult validationResult = new ValidationResult(templateDto);
+        if(validationResult.isViolated())
         {
             onError.action(
-                    new RequestDataException("Wrong request data: ", validation)
+                    new RequestDataException("Wrong request data: ", validationResult.getViolations())
             );
             return;
         }

@@ -7,20 +7,14 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import ru.rassokhindanila.restmessagingtemplates.Urls;
-import ru.rassokhindanila.restmessagingtemplates.dto.Response;
-import ru.rassokhindanila.restmessagingtemplates.dto.StringRequest;
-import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDataDto;
-import ru.rassokhindanila.restmessagingtemplates.dto.TemplateDto;
+import ru.rassokhindanila.restmessagingtemplates.dto.*;
 import ru.rassokhindanila.restmessagingtemplates.exception.DataExistsException;
 import ru.rassokhindanila.restmessagingtemplates.exception.SenderException;
 import ru.rassokhindanila.restmessagingtemplates.service.LoggerService;
 import ru.rassokhindanila.restmessagingtemplates.service.SavedTemplateService;
 import ru.rassokhindanila.restmessagingtemplates.service.TemplateService;
-import ru.rassokhindanila.restmessagingtemplates.util.ValidationUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -47,12 +41,12 @@ public class TemplateController {
      */
     @PostMapping("/add")
     public ResponseEntity<Response> addTemplate(@RequestBody TemplateDto templateDto) {
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDto);
-        if(!validation.isEmpty())
+        ValidationResult validationResult = new ValidationResult(templateDto);
+        if(validationResult.isViolated())
         {
             return ResponseEntity.badRequest()
                     .body(new Response(
-                            ValidationUtils.getMessages(validation)
+                            validationResult.toString()
                         )
                     );
         }
@@ -88,12 +82,12 @@ public class TemplateController {
     @PostMapping("/use")
     public DeferredResult<ResponseEntity<Response>> useTemplate(@RequestBody TemplateDataDto templateDataDto) {
         DeferredResult<ResponseEntity<Response>> response = new DeferredResult<>();
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(templateDataDto);
-        if (!validation.isEmpty()) {
+        ValidationResult validationResult = new ValidationResult(templateDataDto);
+        if (validationResult.isViolated()) {
             response.setResult(
                     ResponseEntity.badRequest()
                     .body(
-                            new Response(ValidationUtils.getMessages(validation))
+                            new Response(validationResult.toString())
                     )
             );
             return response;
@@ -144,12 +138,12 @@ public class TemplateController {
         {
             return ResponseEntity.badRequest().body(new Response("Wrong template id"));
         }
-        Set<ConstraintViolation<Object>> validation =  ValidationUtils.validate(request);
-        if(!validation.isEmpty())
+        ValidationResult validationResult = new ValidationResult(request);
+        if(validationResult.isViolated())
         {
             return ResponseEntity.badRequest()
                     .body(
-                            new Response(ValidationUtils.getMessages(validation))
+                            new Response(validationResult.toString())
                     );
         }
         AtomicReference<ResponseEntity<Response>> response = new AtomicReference<>();
